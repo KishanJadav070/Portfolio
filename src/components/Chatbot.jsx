@@ -7,7 +7,9 @@ const ChatBot = () => {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const messageEndRef = useRef<HTMLDivElement>(null);
+  const messageEndRef = useRef(null);
+
+  const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:5000";
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -18,13 +20,14 @@ const ChatBot = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/chat", {
-        question: input,
+      const res = await axios.post(`${API_BASE}/api/messages`, {
+        role: "user",
+        message: input,
       });
 
       const botMsg = {
         sender: "bot",
-        text: res.data.answer || "Sorry, I couldn't understand that.",
+        text: res.data.message || "Sorry, I couldn't understand that.",
       };
 
       setTimeout(() => {
@@ -32,7 +35,7 @@ const ChatBot = () => {
         setLoading(false);
       }, 700);
     } catch (err) {
-      console.error(err);
+      console.error("❌ Chat Error:", err);
       setMessages((prev) => [
         ...prev,
         { sender: "bot", text: "⚠️ Error connecting to server." },

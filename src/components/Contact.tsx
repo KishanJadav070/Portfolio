@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Send, Github, Linkedin, Twitter } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import axios from 'axios'; // ✅ Make sure axios is installed
 import MagneticButton from './MagneticButton';
 
 const Contact: React.FC = () => {
@@ -18,20 +18,13 @@ const Contact: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase
-        .from('messages')
-        .insert([
-          {
-            name: formData.name,
-            email: formData.email,
-            message: formData.message
-          }
-        ]);
-
-      if (error) throw error;
-
-      setSubmitStatus('success');
-      setFormData({ name: '', email: '', message: '' });
+      const response = await axios.post('http://localhost:5000/api/contact', formData); // 🎯 Update with your deployed URL if needed
+      if (response.data.success) {
+        setSubmitStatus('success');
+        setFormData({ name: '', email: '', message: '' });
+      } else {
+        throw new Error(response.data.error || 'Something went wrong');
+      }
     } catch (error) {
       console.error('Error submitting form:', error);
       setSubmitStatus('error');
@@ -83,12 +76,12 @@ const Contact: React.FC = () => {
     {
       icon: <Twitter size={24} />,
       name: "Twitter",
-      link: " "
+      link: "#"
     }
   ];
 
   return (
-    <section  id="contact" className="min-h-screen py-20 relative">
+    <section id="contact" className="min-h-screen py-20 relative">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -113,7 +106,7 @@ const Contact: React.FC = () => {
             className="bg-background-light/50 backdrop-blur-sm border border-gray-800 rounded-xl p-8"
           >
             <h3 className="text-2xl font-display font-bold mb-6">Send Message</h3>
-            
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-sm font-medium mb-2">Name</label>
