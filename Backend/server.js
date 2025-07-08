@@ -1,11 +1,8 @@
-require('dotenv').config(); // Load env variables first
+require('dotenv').config();
 
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-app.use(cors());
-
-const messageRoutes = require('./routes/messageRoutes');
 
 // ✅ Initialize Express app
 const app = express();
@@ -33,10 +30,22 @@ mongoose.connect(MONGODB_URI, {
 });
 
 // 📦 API Routes
+const messageRoutes = require('./routes/messageRoutes');
 app.use('/api', messageRoutes);
 
-// 🚀 Start Server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+// ✅ Default test route
+app.get('/', (req, res) => {
+  res.send("Server is running!");
 });
+
+// ✅ Hybrid Export/Listen
+if (require.main === module) {
+  // App is being run directly (local dev)
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running locally at http://localhost:${PORT}`);
+  });
+} else {
+  // Export app for serverless (Vercel)
+  module.exports = app;
+}
