@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const Message = require('../model/Message');
-const fetch = require('node-fetch'); // ✅ node-fetch@2 is required
+const fetch = require('node-fetch'); // ✅ node-fetch@2 required
 require('dotenv').config();
 const { profile } = require('../profileData');
 
-// ✅ Gemini 1.5-Pro API Endpoint
+// ✅ Gemini API Endpoint
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=${process.env.GEMINI_API_KEY}`;
 
 if (!process.env.GEMINI_API_KEY) {
@@ -13,7 +13,7 @@ if (!process.env.GEMINI_API_KEY) {
   process.exit(1);
 }
 
-// 🧠 Assistant Personality Prompt
+// 🧠 Kishan's Profile Prompt
 const kishanSystemPrompt = `
 You are a professional and friendly AI assistant representing Kishan Jadav, a skilled frontend React developer.
 
@@ -32,7 +32,7 @@ ${profile.internships.map(i => `- ${i.company} (${i.role}) – ${i.contributions
 🎯 Goals: ${profile.goals.join(", ")}
 `;
 
-// 📌 Static Answers
+// 📌 Static Responses
 const staticAnswers = {
   "hello": "Hello! 😊 I'm Kishan Jadav's AI assistant. How can I help you today?",
   "hi": "Hi there! 👋 What would you like to know about Kishan?",
@@ -43,31 +43,32 @@ const staticAnswers = {
   "your experience": `I'm currently interning at TechNishal and previously worked at InfoLabz. I’ve developed real-world frontend features using React.js and Firebase.`
 };
 
-// 💬 POST Route for Chat
+// 💬 POST /api/messages
 router.post('/messages', async (req, res) => {
   try {
     const { role, message } = req.body;
     if (!role || !message) {
-      return res.status(400).json({ error: 'Role and message are required.' });
+      return res.status(400).json({ error: '❗ Role and message are required.' });
     }
 
     const normalizedMessage = message.toLowerCase().trim();
-    console.log("📝 Received Message:", normalizedMessage);
+    console.log("📝 User Message:", normalizedMessage);
 
     // Save user's message
     await new Message({ role, message }).save();
 
-    // Static answer match
+    // Check for static response
     const matchedKey = Object.keys(staticAnswers).find(
       key => normalizedMessage === key || normalizedMessage.includes(key)
     );
+
     if (matchedKey) {
       const staticReply = staticAnswers[matchedKey];
       await new Message({ role: 'bot', message: staticReply }).save();
       return res.status(200).json({ message: staticReply });
     }
 
-    // 🔄 Gemini API Request
+    // 🧠 Gemini API Call
     const geminiResponse = await fetch(GEMINI_API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -90,22 +91,22 @@ router.post('/messages', async (req, res) => {
     });
 
     const geminiData = await geminiResponse.json();
-    console.log("📦 Gemini API Response:", JSON.stringify(geminiData, null, 2));
+    console.log("📦 Gemini Response:", JSON.stringify(geminiData, null, 2));
 
     const replyText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!replyText) {
-      const errorText = geminiData?.error?.message || "No response from Gemini API.";
+      const errorText = geminiData?.error?.message || "Gemini did not return a response.";
       await new Message({ role: 'bot', message: `❗ Error: ${errorText}` }).save();
-      return res.status(200).json({ message: `Oops! Error: ${errorText}` });
+      return res.status(200).json({ message: `Oops! Gemini API Error: ${errorText}` });
     }
 
-    // Save & send response
+    // Save and send the response
     await new Message({ role: 'bot', message: replyText }).save();
     res.status(200).json({ message: replyText });
 
   } catch (err) {
-    console.error("❌ Error in /messages:", err.message);
+    console.error("❌ Chatbot Route Error:", err);
     res.status(500).json({ message: "Server error. Please try again later." });
   }
 });
