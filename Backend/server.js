@@ -3,6 +3,7 @@ require('dotenv').config(); // Load env variables first
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+app.use(cors());
 
 const messageRoutes = require('./routes/messageRoutes');
 
