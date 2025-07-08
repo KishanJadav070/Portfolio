@@ -1,14 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const Message = require('../model/Message');
-const fetch = require('node-fetch');
+const fetch = require('node-fetch'); // ✅ node-fetch@2 is required
 require('dotenv').config();
 const { profile } = require('../profileData');
 
 // ✅ Gemini 1.5-Pro API Endpoint
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=${process.env.GEMINI_API_KEY}`;
 
-// 🔐 Check if API key is provided
 if (!process.env.GEMINI_API_KEY) {
   console.error("❌ Missing GEMINI_API_KEY in .env");
   process.exit(1);
