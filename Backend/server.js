@@ -19,15 +19,13 @@ if (!MONGODB_URI) {
   process.exit(1);
 }
 
-mongoose.connect(MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log("✅ MongoDB Atlas connected"))
-.catch((err) => {
-  console.error("❌ MongoDB connection error:", err.message);
-  process.exit(1);
-});
+// ✅ Mongoose connect without deprecated options
+mongoose.connect(MONGODB_URI)
+  .then(() => console.log("✅ MongoDB Atlas connected"))
+  .catch((err) => {
+    console.error("❌ MongoDB connection error:", err.message);
+    process.exit(1);
+  });
 
 // 📦 API Routes
 const messageRoutes = require('./routes/messageRoutes');
@@ -35,17 +33,17 @@ app.use('/api', messageRoutes);
 
 // ✅ Default test route
 app.get('/', (req, res) => {
-  res.send("Server is running!");
+  res.send("🚀 Server is running!");
 });
 
-// ✅ Hybrid Export/Listen
+// ✅ Hybrid Export/Listen for Vercel + Local
 if (require.main === module) {
-  // App is being run directly (local dev)
+  // Run locally
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
     console.log(`🚀 Server running locally at http://localhost:${PORT}`);
   });
 } else {
-  // Export app for serverless (Vercel)
+  // Export for serverless (Vercel)
   module.exports = app;
 }
