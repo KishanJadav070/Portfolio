@@ -7,24 +7,27 @@ const cors = require('cors');
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: '*', // Or replace '*' with your frontend domain for security
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type'],
+}));
 app.use(express.json());
 
-// Connect to MongoDB
+// MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('✅ Connected to MongoDB'))
   .catch((err) => {
     console.error('❌ Failed to connect to MongoDB:', err.message);
-    process.exit(1); 
+    process.exit(1);
   });
 
-// Import Routes
+// Routes
 const contactRoutes = require('./routes/contact');
 const chatbotRoutes = require('./routes/messageRoutes');
 
-// Routes
-app.use('/api/contact', contactRoutes);      // POST /api/contact
-app.use('/api/messages', chatbotRoutes);     // POST /api/messages
+app.use('/api/contact', contactRoutes);       // POST /api/contact
+app.use('/api/messages', chatbotRoutes);      // POST /api/messages
 
 // Health Check Route
 app.get('/', (req, res) => {
