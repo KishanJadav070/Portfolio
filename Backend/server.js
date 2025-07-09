@@ -1,23 +1,37 @@
+// Load environment variables
+require('dotenv').config();
+
+// Import required modules
 const express = require('express');
-const router = express.Router();
-const Message = require('./model/Message'); 
+const mongoose = require('mongoose');
+const cors = require('cors');
 
-router.post('/', async (req, res) => {
-  try {
-    const { name, email, message } = req.body;
+// Initialize Express app
+const app = express();
 
-    if (!name || !email || !message) {
-      return res.status(400).json({ success: false, error: 'All fields are required' });
-    }
+// Middleware
+app.use(cors()); // Enable CORS for all origins
+app.use(express.json()); // Parse JSON request bodies
 
-    const newMessage = new Message({ name, email, message });
-    await newMessage.save();
+// MongoDB Connection
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log('✅ Connected to MongoDB'))
+.catch((err) => console.error('❌ MongoDB connection error:', err));
 
-    res.status(201).json({ success: true, message: 'Message saved successfully!' });
-  } catch (err) {
-    console.error('Error saving message:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
+// Import and use routes
+const messageRoutes = require('./routes/messageRoutes');
+app.use('/api/messages', messageRoutes); // Example route
+
+// Root Route
+app.get('/', (req, res) => {
+  res.send('🚀 Server is running...');
 });
 
-module.exports = router;
+// Start server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`🌐 Server is listening on http://localhost:${PORT}`);
+});
