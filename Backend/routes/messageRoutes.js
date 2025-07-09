@@ -31,7 +31,7 @@ ${profile.internships.map(i => `- ${i.company} (${i.role}) – ${i.contributions
 🎯 Goals: ${profile.goals.join(", ")}
 `;
 
-// Static Answers
+// Static Predefined Answers
 const staticAnswers = {
   "hello": "Hello! 😊 I'm Kishan Jadav's AI assistant. How can I help you today?",
   "hi": "Hi there! 👋 What would you like to know about Kishan?",
@@ -48,14 +48,16 @@ router.post('/', async (req, res) => {
     const { role, message } = req.body;
 
     if (!role || !message) {
-      return res.status(400).json({ error: '❗ Role and message are required.' });
+      return res.status(400).json({ error: '❗ Both role and message are required.' });
     }
 
     const normalizedMessage = message.toLowerCase().trim();
     console.log("📝 Message received:", normalizedMessage);
 
+    // Save user message
     await new Message({ role, message }).save();
 
+    // Check for static replies
     const matchedKey = Object.keys(staticAnswers).find(
       key => normalizedMessage === key || normalizedMessage.includes(key)
     );
@@ -66,6 +68,7 @@ router.post('/', async (req, res) => {
       return res.status(200).json({ message: staticReply });
     }
 
+    // Gemini API Request
     const geminiResponse = await fetch(GEMINI_API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -86,16 +89,18 @@ router.post('/', async (req, res) => {
 
     if (!replyText) {
       const errorText = geminiData?.error?.message || "Gemini API did not return a message.";
-      await new Message({ role: 'bot', message: `❗ Gemini Error: ${errorText}` }).save();
-      return res.status(200).json({ message: `❌ Gemini API Error: ${errorText}` });
+      const errorMessage = `❌ Gemini Error: ${errorText}`;
+      await new Message({ role: 'bot', message: errorMessage }).save();
+      return res.status(200).json({ message: errorMessage });
     }
 
+    // Save and return Gemini response
     await new Message({ role: 'bot', message: replyText }).save();
     res.status(200).json({ message: replyText });
 
   } catch (err) {
-    console.error("❌ Chatbot Error:", err);
-    res.status(500).json({ message: "Server error. Try again later." });
+    console.error("❌ Chatbot Error:", err.message);
+    res.status(500).json({ message: "❗ Internal server error. Please try again later." });
   }
 });
 
