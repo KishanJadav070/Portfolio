@@ -20,7 +20,9 @@ const Contact: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/contact`, formData);
+      const response = await axios.post(`${API_BASE_URL}/api/messages`, formData);
+      console.log("Server response:", response.data);
+
       if (response.data.success) {
         setSubmitStatus('success');
         setFormData({ name: '', email: '', message: '' });
@@ -175,7 +177,6 @@ const Contact: React.FC = () => {
             transition={{ duration: 0.6 }}
             className="space-y-8"
           >
-            {/* Contact Cards */}
             <div className="space-y-4">
               {contactInfo.map((info, index) => (
                 <motion.a
@@ -199,7 +200,6 @@ const Contact: React.FC = () => {
               ))}
             </div>
 
-            {/* Social Links */}
             <div className="bg-background-light/50 backdrop-blur-sm border border-gray-800 rounded-xl p-6">
               <h3 className="text-xl font-semibold mb-4">Connect with Me</h3>
               <div className="flex flex-wrap gap-4">
