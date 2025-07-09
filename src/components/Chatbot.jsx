@@ -9,8 +9,8 @@ const ChatBot = () => {
   const [loading, setLoading] = useState(false);
   const messageEndRef = useRef(null);
 
-  // ✅ Use Vite env variable correctly
-  const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+  
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
   const handleSend = async () => {
     if (!input.trim()) return;
