@@ -9,8 +9,8 @@ const ChatBot = () => {
   const [loading, setLoading] = useState(false);
   const messageEndRef = useRef(null);
 
-  const API_BASE = import.meta.env.VITE_API_BASE_URL;
-
+  // ✅ Use Vite env variable correctly
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -21,23 +21,22 @@ const ChatBot = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post(`${API_BASE}/api/messages`, {
+      const response = await axios.post(`${API_BASE}/api/messages`, {
         role: "user",
         message: input,
       });
-      
 
       const botMsg = {
         sender: "bot",
-        text: res.data.message || "Sorry, I couldn't understand that.",
+        text: response.data.message || "Sorry, I couldn't understand that.",
       };
 
       setTimeout(() => {
         setMessages((prev) => [...prev, botMsg]);
         setLoading(false);
       }, 700);
-    } catch (err) {
-      console.error("❌ Chat Error:", err);
+    } catch (error) {
+      console.error("❌ Chat Error:", error);
       setMessages((prev) => [
         ...prev,
         { sender: "bot", text: "⚠️ Error connecting to server." },
@@ -46,6 +45,7 @@ const ChatBot = () => {
     }
   };
 
+  // Auto-scroll to latest message
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
