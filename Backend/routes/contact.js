@@ -2,12 +2,10 @@ const express = require('express');
 const router = express.Router();
 const Message = require('../model/Message');
 
-// POST /api/contact
 router.post('/', async (req, res) => {
   try {
     const { name, email, message } = req.body;
 
-    // Basic validation
     if (!name?.trim() || !email?.trim() || !message?.trim()) {
       return res.status(400).json({
         success: false,
@@ -15,12 +13,11 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // Create and save message
     const newMessage = new Message({
       name: name.trim(),
       email: email.trim().toLowerCase(),
       message: message.trim(),
-      role: 'user', // Optional field, if your schema includes it
+      role: 'user',
     });
 
     await newMessage.save();

@@ -4,7 +4,7 @@ import { Mail, Phone, MapPin, Send, Github, Linkedin, Twitter } from 'lucide-rea
 import axios from 'axios';
 import MagneticButton from './MagneticButton';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 const Contact: React.FC = () => {
   const [formData, setFormData] = useState({

@@ -9,7 +9,7 @@ const ChatBot = () => {
   const [loading, setLoading] = useState(false);
   const messageEndRef = useRef(null);
 
-  const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:5000";
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || ""; // auto uses Vercel domain when empty
 
   const handleSend = async () => {
     if (!input.trim()) return;

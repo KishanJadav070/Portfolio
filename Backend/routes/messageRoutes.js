@@ -12,13 +12,10 @@ if (!process.env.GEMINI_API_KEY) {
   process.exit(1);
 }
 
-// System Prompt
 const kishanSystemPrompt = `
 You are a professional and friendly AI assistant representing Kishan Jadav, a skilled frontend React developer.
 
 Speak confidently and clearly, like ChatGPT. Use only Kishan's real portfolio details to answer.
-
----
 
 👤 Name: ${profile.name}
 🎓 Education: ${profile.education}
@@ -31,7 +28,6 @@ ${profile.internships.map(i => `- ${i.company} (${i.role}) – ${i.contributions
 🎯 Goals: ${profile.goals.join(", ")}
 `;
 
-// Static Predefined Answers
 const staticAnswers = {
   "hello": "Hello! 😊 I'm Kishan Jadav's AI assistant. How can I help you today?",
   "hi": "Hi there! 👋 What would you like to know about Kishan?",
@@ -42,7 +38,6 @@ const staticAnswers = {
   "your experience": `I'm currently interning at TechNishal and previously worked at InfoLabz.`
 };
 
-// POST /api/messages
 router.post('/', async (req, res) => {
   try {
     const { role, message } = req.body;
@@ -54,10 +49,8 @@ router.post('/', async (req, res) => {
     const normalizedMessage = message.toLowerCase().trim();
     console.log("📝 Message received:", normalizedMessage);
 
-    // Save user message
     await new Message({ role, message }).save();
 
-    // Check for static replies
     const matchedKey = Object.keys(staticAnswers).find(
       key => normalizedMessage === key || normalizedMessage.includes(key)
     );
@@ -68,7 +61,6 @@ router.post('/', async (req, res) => {
       return res.status(200).json({ message: staticReply });
     }
 
-    // Gemini API Request
     const geminiResponse = await fetch(GEMINI_API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -94,7 +86,6 @@ router.post('/', async (req, res) => {
       return res.status(200).json({ message: errorMessage });
     }
 
-    // Save and return Gemini response
     await new Message({ role: 'bot', message: replyText }).save();
     res.status(200).json({ message: replyText });
 

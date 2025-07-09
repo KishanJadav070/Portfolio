@@ -21,7 +21,7 @@ const Hero: React.FC = () => {
 
   const handleSendMessage = async () => {
     try {
-      await axios.post("http://localhost:5000/api/messages", { role, message });
+    await axios.post(`${import.meta.env.VITE_API_BASE_URL || ''}/api/messages`, { role, message });
       alert("Message sent successfully!");
       setShowHireModal(false);
       setMessage("");

@@ -3,12 +3,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
-// Initialize Express App
 const app = express();
 
 // Middleware
 app.use(cors({
-  origin: '*', // Or replace '*' with your frontend domain for security
+  origin: '*',
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type'],
 }));
@@ -26,16 +25,12 @@ mongoose.connect(process.env.MONGODB_URI)
 const contactRoutes = require('./routes/contact');
 const chatbotRoutes = require('./routes/messageRoutes');
 
-app.use('/api/contact', contactRoutes);       // POST /api/contact
-app.use('/api/messages', chatbotRoutes);      // POST /api/messages
+app.use('/api/contact', contactRoutes);
+app.use('/api/messages', chatbotRoutes);
 
-// Health Check Route
 app.get('/', (req, res) => {
   res.send('🚀 Server is running...');
 });
 
-// Start Server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🌐 Server is listening at http://localhost:${PORT}`);
-});
+// ✅ Must export the app for Vercel
+module.exports = app;

@@ -20,7 +20,7 @@ const messageSchema = new mongoose.Schema({
   role: {
     type: String,
     required: [true, 'Role is required'],
-    enum: ['user', 'bot', 'admin', 'recruiter', 'guest'], // ✅ updated to support more types
+    enum: ['user', 'bot', 'admin', 'recruiter', 'guest'],
     lowercase: true,
     trim: true,
   },
