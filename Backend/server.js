@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Message = require('../model/Message'); // Make sure path is correct
+const Message = require('./model/Message'); 
 
 router.post('/', async (req, res) => {
   try {
