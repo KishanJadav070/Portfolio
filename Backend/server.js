@@ -14,12 +14,14 @@ app.use(cors({
 app.use(express.json());
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('✅ Connected to MongoDB'))
-  .catch((err) => {
-    console.error('❌ Failed to connect to MongoDB:', err.message);
-    process.exit(1);
-  });
+mongoose.connect(process.env.MONGODB_URI, {
+  serverSelectionTimeoutMS: 30000, // 30 seconds
+})
+.then(() => console.log("✅ Connected to MongoDB"))
+.catch((err) => {
+  console.error("❌ Failed to connect to MongoDB:", err.message);
+});
+
 
 // Routes
 const contactRoutes = require('./routes/contact');
