@@ -5,13 +5,16 @@ const Message = require('../model/Message');
 const { profile } = require('../profileData');
 require('dotenv').config();
 
+// ✅ Gemini API URL with Key
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=${process.env.GEMINI_API_KEY}`;
 
+// ✅ Validate .env Key Presence
 if (!process.env.GEMINI_API_KEY) {
   console.error("❌ Missing GEMINI_API_KEY in .env");
   process.exit(1);
 }
 
+// ✅ System Prompt Based on Portfolio Data
 const kishanSystemPrompt = `
 You are a professional and friendly AI assistant representing Kishan Jadav, a skilled frontend React developer.
 
@@ -28,6 +31,7 @@ ${profile.internships.map(i => `- ${i.company} (${i.role}) – ${i.contributions
 🎯 Goals: ${profile.goals.join(", ")}
 `;
 
+// ✅ Static Replies for Common Questions
 const staticAnswers = {
   "hello": "Hello! 😊 I'm Kishan Jadav's AI assistant. How can I help you today?",
   "hi": "Hi there! 👋 What would you like to know about Kishan?",
@@ -38,6 +42,7 @@ const staticAnswers = {
   "your experience": `I'm currently interning at TechNishal and previously worked at InfoLabz.`
 };
 
+// ✅ POST /api/messages
 router.post('/', async (req, res) => {
   try {
     const { role, message } = req.body;
@@ -49,8 +54,10 @@ router.post('/', async (req, res) => {
     const normalizedMessage = message.toLowerCase().trim();
     console.log("📝 Message received:", normalizedMessage);
 
+    // ✅ Save user message to DB
     await new Message({ role, message }).save();
 
+    // ✅ Static reply if matched
     const matchedKey = Object.keys(staticAnswers).find(
       key => normalizedMessage === key || normalizedMessage.includes(key)
     );
@@ -61,6 +68,7 @@ router.post('/', async (req, res) => {
       return res.status(200).json({ message: staticReply });
     }
 
+    // ✅ Send to Gemini
     const geminiResponse = await fetch(GEMINI_API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -79,6 +87,7 @@ router.post('/', async (req, res) => {
     const geminiData = await geminiResponse.json();
     const replyText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
 
+    // ✅ Fallback if Gemini fails
     if (!replyText) {
       const errorText = geminiData?.error?.message || "Gemini API did not return a message.";
       const errorMessage = `❌ Gemini Error: ${errorText}`;
@@ -86,6 +95,7 @@ router.post('/', async (req, res) => {
       return res.status(200).json({ message: errorMessage });
     }
 
+    // ✅ Save and respond with Gemini reply
     await new Message({ role: 'bot', message: replyText }).save();
     res.status(200).json({ message: replyText });
 
