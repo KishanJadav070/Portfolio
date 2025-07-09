@@ -11,14 +11,11 @@ app.use(cors());
 app.use(express.json());
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,         // Optional in Mongoose 6+, but safe
-  useUnifiedTopology: true       // Optional in Mongoose 6+
-})
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('✅ Connected to MongoDB'))
   .catch((err) => {
     console.error('❌ Failed to connect to MongoDB:', err.message);
-    process.exit(1); // Exit process if DB connection fails
+    process.exit(1); 
   });
 
 // Import Routes
