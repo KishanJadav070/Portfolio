@@ -1,37 +1,38 @@
-// Load environment variables
 require('dotenv').config();
-
-// Import required modules
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
-// Initialize Express app
+// Init Express
 const app = express();
 
 // Middleware
-app.use(cors()); // Enable CORS for all origins
-app.use(express.json()); // Parse JSON request bodies
+app.use(cors());
+app.use(express.json());
 
-// MongoDB Connection
+// MongoDB Connect
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-.then(() => console.log('✅ Connected to MongoDB'))
-.catch((err) => console.error('❌ MongoDB connection error:', err));
+  .then(() => console.log('✅ Connected to MongoDB'))
+  .catch((err) => console.error('❌ MongoDB connection error:', err));
 
-// Import and use routes
-const messageRoutes = require('./routes/messageRoutes');
-app.use('/api/messages', messageRoutes); // Example route
+// Import Routes
+const contactRoutes = require('./routes/contact'); // For contact form
+const chatbotRoutes = require('./routes/chatbot'); // For chatbot + Gemini
 
-// Root Route
+// Use Routes
+app.use('/api/contact', contactRoutes);      // POST to /api/contact
+app.use('/api/messages', chatbotRoutes);     // POST to /api/messages
+
+// Health check
 app.get('/', (req, res) => {
   res.send('🚀 Server is running...');
 });
 
-// Start server
+// Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🌐 Server is listening on http://localhost:${PORT}`);
+  console.log(`🌐 Server listening at http://localhost:${PORT}`);
 });

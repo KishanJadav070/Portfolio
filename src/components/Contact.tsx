@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Send, Github, Linkedin, Twitter } from 'lucide-react';
-import axios from 'axios'; // ✅ Make sure axios is installed
+import axios from 'axios';
 import MagneticButton from './MagneticButton';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
 const Contact: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -18,7 +20,7 @@ const Contact: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/contact', formData); // 🎯 Update with your deployed URL if needed
+      const response = await axios.post(`${API_BASE_URL}/api/contact`, formData);
       if (response.data.success) {
         setSubmitStatus('success');
         setFormData({ name: '', email: '', message: '' });
@@ -153,14 +155,7 @@ const Contact: React.FC = () => {
                   disabled={isSubmitting}
                   className="w-full bg-gradient-to-r from-primary-light to-primary hover:from-primary hover:to-primary-dark text-white font-medium px-8 py-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-300 disabled:opacity-50"
                 >
-                  {isSubmitting ? (
-                    'Sending...'
-                  ) : (
-                    <>
-                      Send Message
-                      <Send size={18} />
-                    </>
-                  )}
+                  {isSubmitting ? 'Sending...' : <>Send Message <Send size={18} /></>}
                 </button>
               </MagneticButton>
 

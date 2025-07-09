@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const Message = require('../model/Message'); 
+const Message = require('../model/Message');
 
+// POST /api/contact
 router.post('/', async (req, res) => {
   try {
     const { name, email, message } = req.body;
@@ -15,7 +16,7 @@ router.post('/', async (req, res) => {
 
     res.status(201).json({ success: true, message: 'Message saved successfully!' });
   } catch (err) {
-    console.error('Error saving message:', err);
+    console.error('❌ Error saving contact message:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
