@@ -9,7 +9,8 @@ const ChatBot = () => {
   const [loading, setLoading] = useState(false);
   const messageEndRef = useRef(null);
 
-  const API_BASE = import.meta.env.VITE_API_BASE_URL || ""; // auto uses Vercel domain when empty
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -24,6 +25,7 @@ const ChatBot = () => {
         role: "user",
         message: input,
       });
+      
 
       const botMsg = {
         sender: "bot",
